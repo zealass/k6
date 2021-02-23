@@ -80,7 +80,7 @@ func validateStages(stages []Stage) []error {
 //
 // TODO: emit the end-of-test iteration metrics here (https://github.com/loadimpact/k6/issues/1250)
 func getIterationRunner(
-	executionState *lib.ExecutionState, logger *logrus.Entry,
+	executionState *lib.ExecutionState, incrScenarioIter func(), logger *logrus.Entry,
 ) func(context.Context, lib.ActiveVU) bool {
 	return func(ctx context.Context, vu lib.ActiveVU) bool {
 		err := vu.RunOnce()
@@ -108,6 +108,7 @@ func getIterationRunner(
 
 			// TODO: move emission of end-of-iteration metrics here?
 			executionState.AddFullIterations(1)
+			incrScenarioIter()
 			return true
 		}
 	}
