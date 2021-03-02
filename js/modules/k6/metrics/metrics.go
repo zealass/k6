@@ -24,6 +24,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"time"
 
@@ -52,14 +53,17 @@ type Metric struct {
 }
 
 // ErrMetricsAddInInitContext is error returned when adding to metric is done in the init context
-var ErrMetricsAddInInitContext = common.NewInitContextError("Adding to metrics in the init context is not supported")
+var (
+	ErrMetricsAddInInitContext = common.NewInitContextError("Adding to metrics in the init context is not supported")
+	ErrMetricsAddNan           = errors.New("adding a non number, non boolean to a metric")
+)
 
 func newMetric(ctxPtr *context.Context, name string, t stats.MetricType, isTime []bool) (interface{}, error) {
 	if lib.GetState(*ctxPtr) != nil {
 		return nil, errors.New("metrics must be declared in the init context")
 	}
 
-	//TODO: move verification outside the JS
+	// TODO: move verification outside the JS
 	if !checkName(name) {
 		return nil, common.NewInitContextError(fmt.Sprintf("Invalid metric name: '%s'", name))
 	}
@@ -89,6 +93,10 @@ func (m Metric) Add(ctx context.Context, v goja.Value, addTags ...map[string]str
 	vfloat := v.ToFloat()
 	if vfloat == 0 && v.ToBoolean() {
 		vfloat = 1.0
+	}
+
+	if math.IsNaN(vfloat) {
+		return false, ErrMetricsAddNan
 	}
 
 	sample := stats.Sample{Time: time.Now(), Metric: m.metric, Value: vfloat, Tags: stats.IntoSampleTags(&tags)}
