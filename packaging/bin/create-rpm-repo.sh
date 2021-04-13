@@ -66,6 +66,7 @@ for arch in $architectures; do
   find "$PKGDIR" -name "*${arch/x86_64/amd64}*.rpm" -type f -print0 | while read -r -d $'\0' f; do
     cp -av "$f" "$PWD/"
     rpm --addsign "${f##*/}"
+    touch -r "$f" "${f##*/}"
   done
   createrepo .
   cd -

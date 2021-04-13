@@ -80,6 +80,7 @@ for arch in $architectures; do
     if ! [ -r "${f}.asc" ]; then
       gpg2 --default-key="$PGPKEYID" --passphrase="$PGP_SIGN_KEY_PASSPHRASE" \
         --pinentry-mode=loopback --yes --detach-sign --armor -o "${f}.asc" "$f"
+      touch -r "$f" "${f}.asc"
     fi
   done
   apt-ftparchive packages "$bindir" | tee "$bindir/Packages"
