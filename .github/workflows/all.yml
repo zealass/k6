@@ -420,5 +420,5 @@ jobs:
         run: |
           echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
           cd packaging
-          docker-compose pull packager
+          # docker-compose pull packager
           docker-compose run --rm packager
