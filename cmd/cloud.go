@@ -34,6 +34,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/spf13/cobra"
@@ -43,7 +44,6 @@ import (
 	"github.com/loadimpact/k6/lib"
 	"github.com/loadimpact/k6/lib/consts"
 	"github.com/loadimpact/k6/loader"
-	"github.com/loadimpact/k6/ui"
 	"github.com/loadimpact/k6/ui/pb"
 )
 
@@ -83,7 +83,7 @@ This will execute the test on the k6 cloud service. Use "k6 login cloud" to auth
 				}
 			}
 			// TODO: disable in quiet mode?
-			_, _ = BannerColor.Fprintf(stdout, "\n%s\n\n", consts.Banner())
+			_, _ = fmt.Fprintf(stdout, "\n%s\n\n", getBanner(noColor || !stdoutTTY))
 
 			progressBar := pb.New(
 				pb.WithConstLeft("Init"),
@@ -242,7 +242,10 @@ This will execute the test on the k6 cloud service. Use "k6 login cloud" to auth
 			}
 			testURL := cloudapi.URLForResults(refID, cloudConfig)
 			executionPlan := derivedConf.Scenarios.GetFullExecutionRequirements(et)
-			printExecutionDescription("cloud", filename, testURL, derivedConf, et, executionPlan, nil)
+			printExecutionDescription(
+				"cloud", filename, testURL, derivedConf, et,
+				executionPlan, nil, noColor || !stdoutTTY,
+			)
 
 			modifyAndPrintBar(
 				progressBar,
@@ -330,7 +333,8 @@ This will execute the test on the k6 cloud service. Use "k6 login cloud" to auth
 				return ExitCode{error: errors.New("Test progress error"), Code: cloudFailedToGetProgressErrorCode}
 			}
 
-			fprintf(stdout, "     test status: %s\n", ui.ValueColor.Sprint(testProgress.RunStatusText))
+			valueColor := getColor(noColor || !stdoutTTY, color.FgCyan)
+			fprintf(stdout, "     test status: %s\n", valueColor.Sprint(testProgress.RunStatusText))
 
 			if testProgress.ResultStatus == cloudapi.ResultStatusFailed {
 				//nolint:golint
