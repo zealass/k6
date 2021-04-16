@@ -28,7 +28,6 @@ import (
 
 	v1 "github.com/loadimpact/k6/api/v1"
 	"github.com/loadimpact/k6/api/v1/client"
-	"github.com/loadimpact/k6/ui"
 )
 
 func getResumeCmd(ctx context.Context) *cobra.Command {
@@ -50,8 +49,8 @@ func getResumeCmd(ctx context.Context) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ui.Dump(stdout, status)
-			return nil
+
+			return yamlPrint(stdout, status)
 		},
 	}
 	return resumeCmd
