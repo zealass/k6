@@ -68,6 +68,7 @@ const summaryWrapperLambdaCode = `
 		// Quick copy of the data, since it's easiest to modify it in place.
 		var results = JSON.parse(JSON.stringify(data));
 		delete results.options;
+		delete results.uiState;
 
 		forEach(results.metrics, function(metricName, metric) {
 			var oldFormatMetric = metric.values;
@@ -164,6 +165,11 @@ func summarizeMetricsToObject(data *lib.Summary, options lib.Options) map[string
 		// TODO: improve when we can easily export all option values, including defaults?
 		"summaryTrendStats": options.SummaryTrendStats,
 		"summaryTimeUnit":   options.SummaryTimeUnit.String,
+	}
+	m["uiState"] = map[string]interface{}{
+		"areColorsDisabled": data.UIState.AreColorsDisabled,
+		"isStdOutTTY":       data.UIState.IsStdOutTTY,
+		"isStdErrTTY":       data.UIState.IsStdErrTTY,
 	}
 
 	getMetricValues := metricValueGetter(options.SummaryTrendStats)

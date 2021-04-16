@@ -330,6 +330,11 @@ const expectedHandleSummaryRawData = `
         ],
         "summaryTimeUnit": ""
     },
+	"uiState": {
+		"areColorsDisabled": false,
+		"isStdErrTTY": false,
+		"isStdOutTTY": false
+	},
     "metrics": {
         "checks": {
             "contains": "default",

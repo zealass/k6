@@ -297,6 +297,11 @@ a commandline interface for interacting with it.`,
 					Metrics:         engine.Metrics,
 					RootGroup:       engine.ExecutionScheduler.GetRunner().GetDefaultGroup(),
 					TestRunDuration: executionState.GetCurrentTestRunDuration(),
+					UIState: lib.UIState{
+						AreColorsDisabled: noColor,
+						IsStdOutTTY:       stdoutTTY,
+						IsStdErrTTY:       stderrTTY,
+					},
 				})
 				if err == nil {
 					err = handleSummaryResult(afero.NewOsFs(), stdout, stderr, summaryResult)
